@@ -1,199 +1,132 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-/* 全局样式 - Apple 风格 */
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
 body {
-  background-color: #F5F5F7; /* 使用苹果的浅灰色背景 */
-  color: #1c1c1e; /* 深色文字 */
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  /* 移动端性能优化 */
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: none;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-/* 隐藏滚动条但保持功能 */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+/* 入场动画 - 只用 opacity 和 transform，GPU 加速 */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
+@keyframes fade-in-up {
+  from { 
+    opacity: 0; 
+    transform: translateY(10px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
 }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 3px;
+.animate-fade-in {
+  opacity: 0;
+  animation: fade-in 0.5s ease-out forwards;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.3);
+.animate-fade-in-up {
+  opacity: 0;
+  animation: fade-in-up 0.5s ease-out forwards;
 }
 
-/* 玻璃拟态效果 - 更接近 iOS/macOS 风格 */
-.glass {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.glass-dark {
-  background: rgba(50, 50, 50, 0.6);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* 平滑过渡 - 移动端优化 */
-* {
-  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
-}
-
-/* 移动端禁用过渡以提升性能 */
-@media (hover: none) and (pointer: coarse) {
+/* 移动端：禁用入场动画，直接显示 */
+@media (max-width: 767px) {
+  .animate-fade-in,
+  .animate-fade-in-up {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+  
+  /* 禁用 backdrop-filter */
+  .backdrop-blur-xl,
+  .backdrop-blur-md,
+  .backdrop-blur-sm {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  
+  /* 移动端禁用所有 transition，提升滚动性能 */
   * {
-    transition-duration: 0ms;
+    transition: none !important;
   }
-
-  /* 仅保留关键动画 */
-  .important-transition {
-    transition-duration: 150ms !important;
-  }
-}
-
-/* 移动端滚动优化 */
-.scroll-container {
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: contain;
-  scroll-behavior: smooth;
-}
-
-/* 禁用点击高亮 - 全局 */
-* {
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
-/* 允许文本选择 */
-input, textarea, [contenteditable] {
-  -webkit-user-select: text;
-  -moz-user-select: text;
-  -ms-user-select: text;
-  user-select: text;
-}
-
-/* 性能优化 - GPU 加速 */
-.gpu-accelerate {
-  transform: translateZ(0);
-  will-change: transform;
-  backface-visibility: hidden;
-  perspective: 1000px;
-}
-
-/* 移动端滚动性能优化 */
-@supports (-webkit-overflow-scrolling: touch) {
-  .scroll-container,
-  [style*="overflow"] {
-    -webkit-overflow-scrolling: touch;
+  
+  /* 仅保留必要的点击反馈 */
+  .active\:scale-\[0\.98\]:active {
+    transform: scale(0.98) !important;
+    transition: transform 0.1s !important;
   }
 }
 
-/* 减少重绘 */
-.will-change-scroll {
-  will-change: scroll-position;
-}
-
-.will-change-opacity {
-  will-change: opacity;
-}
-
-/* 移动端优化 - 减少复杂阴影 */
-@media (hover: none) and (pointer: coarse) {
-  .shadow-xl,
-  .shadow-2xl,
-  .shadow-lg {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
-  }
-
-  .drop-shadow-lg,
-  .drop-shadow-xl,
-  .drop-shadow-2xl {
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15)) !important;
+/* 尊重用户的减少动画偏好 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
-/* 移动端输入框优化 */
-input[type="text"],
-input[type="search"] {
-  font-size: 16px; /* 防止 iOS 自动缩放 */
+/* 隐藏滚动条但保持滚动功能 */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 
-/* 电脑端适配样式 */
+/* 移动端安全区域适配 */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* 背景动画 - 仅桌面端 */
+@keyframes pulse-slow { 
+  0%, 100% { opacity: 0.4; } 
+  50% { opacity: 0.7; } 
+}
+
+@keyframes shooting-line { 
+  0% { left: -10%; opacity: 0; } 
+  5% { opacity: 1; } 
+  20% { left: 110%; opacity: 0; } 
+  100% { left: 110%; opacity: 0; } 
+}
+
 @media (min-width: 768px) {
-  /* 电脑端恢复过渡效果 */
-  * {
-    transition-duration: 150ms;
+  .animate-pulse-slow { 
+    animation: pulse-slow 6s ease-in-out infinite; 
   }
-
-  /* 电脑端鼠标悬停效果 */
-  .desktop-hover:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-  }
-
-  /* 电脑端按钮悬停 */
-  .desktop-button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
-  }
-
-  /* 电脑端卡片悬停 */
-  .desktop-card:hover {
-    border-color: rgba(255, 255, 255, 0.3);
-    background: rgba(0, 0, 0, 0.35);
-  }
-
-  /* 电脑端输入框样式 */
-  input[type="text"],
-  input[type="search"],
-  input[type="number"] {
-    font-size: 14px;
-  }
-
-  /* 电脑端滚动条样式 */
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 4px;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.5);
-  }
-}
-
-/* 大屏幕电脑端优化 */
-@media (min-width: 1024px) {
-  /* 更大的阴影效果 */
-  .desktop-hover:hover {
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
-  }
-
-  .desktop-button:hover {
-    box-shadow: 0 6px 20px rgba(0, 122, 255, 0.4);
+  .animate-shooting-line { 
+    animation: shooting-line 8s linear infinite; 
+    animation-delay: 2s; 
   }
 }
